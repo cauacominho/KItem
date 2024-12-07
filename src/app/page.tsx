@@ -27,6 +27,7 @@ export default function Home() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null); // Atualiza o estado com o usuário logado
+        setLoading(false);
       }
     );
 
@@ -73,6 +74,10 @@ export default function Home() {
         </svg>
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (

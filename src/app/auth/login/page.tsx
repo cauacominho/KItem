@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Verifica se o usuário já está logado
   useEffect(() => {
@@ -21,6 +22,8 @@ export default function LoginPage() {
       if (data?.user) {
         // Redireciona para a home caso o usuário esteja logado
         router.push("/");
+      } else {
+        setLoading(false);
       }
     };
 
@@ -42,6 +45,33 @@ export default function LoginPage() {
       router.push("/");
     }
   };
+
+  if (loading) {
+    // Exibe um indicador de carregamento enquanto verifica a autenticação
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <svg
+          className="animate-spin h-12 w-12 text-primary"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            fill="currentColor"
+            d="M4 12a8 8 0 0 1 8-8V0c-5.523 0-10 4.477-10 10h2z"
+          />
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-background">

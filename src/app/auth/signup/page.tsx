@@ -13,6 +13,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Verifica se o usuário já está logado
   useEffect(() => {
@@ -22,6 +23,9 @@ export default function SignUpPage() {
       if (data?.user) {
         // Redireciona para a home caso o usuário esteja logado
         router.push("/");
+      } else {
+        // Conclui o carregamento
+        setLoading(false);
       }
     };
 
@@ -44,13 +48,41 @@ export default function SignUpPage() {
       );
       setError("");
 
-      // Redireciona o usuário para a página de login ou outra página após o cadastro
+      // Redireciona o usuário para a página de login após o cadastro
       setTimeout(() => {
-        router.push("/auth/login"); // Ou a página de login
-      }, 3000); // 3 segundos para mostrar a mensagem de sucesso antes de redirecionar
+        router.push("/auth/login");
+      }, 3000); // Exibe a mensagem de sucesso por 3 segundos antes do redirecionamento
     }
   };
 
+  if (loading) {
+    // Exibe um indicador de carregamento enquanto verifica a autenticação
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <svg
+          className="animate-spin h-12 w-12 text-primary"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            fill="currentColor"
+            d="M4 12a8 8 0 0 1 8-8V0c-5.523 0-10 4.477-10 10h2z"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  // Renderiza o formulário apenas quando não está carregando
   return (
     <div className="flex justify-center items-center min-h-screen bg-background">
       <Card className="w-full max-w-md p-8 border-none shadow-none sm:border sm:border-gray-300">
