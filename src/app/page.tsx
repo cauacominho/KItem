@@ -1,101 +1,90 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase"; // Supabase instance
+import { ModeToggle } from "@/components/ui/button-theme";
+import { useRouter } from "next/navigation";
+
+// Usando o tipo User do Supabase diretamente
+import { User as SupabaseUser } from "@supabase/auth-js";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [user, setUser] = useState<SupabaseUser | null>(null); // Tipando o estado do usuário como 'SupabaseUser' ou 'null'
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data?.user ?? null); // Atualiza o estado do usuário
+      setLoading(false); // Marca como carregado
+    };
+
+    checkUser();
+
+    // Subscribing to auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null); // Atualiza o estado com o usuário logado
+      }
+    );
+
+    // Corrigido: Desinscrevendo corretamente ao desmontar o componente
+    return () => {
+      authListener?.subscription.unsubscribe(); // Acesse a propriedade 'subscription' e chame 'unsubscribe'
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut(); // Realiza o logout
+    router.push("/auth/login"); // Redireciona para a página de login
+  };
+
+  // Redireciona para a página de login se o usuário não estiver logado, mas só depois de carregar
+  useEffect(() => {
+    if (!loading && user === null) {
+      router.push("/auth/login");
+    }
+  }, [user, loading, router]); // Só roda esse efeito quando o usuário mudar e a carga estiver completa
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <svg
+          className="animate-spin h-12 w-12 text-primary"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <path
+            fill="currentColor"
+            d="M4 12a8 8 0 0 1 8-8V0c-5.523 0-10 4.477-10 10h2z"
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <ModeToggle />
+      <h1>Bem-vindo, {user?.email ?? "Usuário"}</h1>
+      {/* Aqui pode ir mais conteúdo que deve ser visível apenas para usuários logados */}
+      <div className="mt-10">
+        <Button className="bg-destructive text-light" onClick={handleLogout}>
+          Sair
+        </Button>
+      </div>
     </div>
   );
 }
