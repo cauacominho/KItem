@@ -10,7 +10,7 @@ export default function RootLayout({
     <>
       <html lang="pt" suppressHydrationWarning>
         <head />
-        <body>
+        <body className="md:mx-8 mt-2">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

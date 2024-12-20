@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button"; // Componente de Button do Shad
 import { Input } from "@/components/ui/input"; // Componente de Input do ShadCN
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Importando os componentes do Card do ShadCN
+import { VscEye, VscEyeClosed } from "react-icons/vsc";
+import { LoaderCircle } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -58,26 +61,8 @@ export default function SignUpPage() {
   if (loading) {
     // Exibe um indicador de carregamento enquanto verifica a autenticação
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <svg
-          className="animate-spin h-12 w-12 text-primary"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-          />
-          <path
-            fill="currentColor"
-            d="M4 12a8 8 0 0 1 8-8V0c-5.523 0-10 4.477-10 10h2z"
-          />
-        </svg>
+      <div className="flex justify-center items-center min-h-screen">
+        <LoaderCircle size={40} className="animate-spin" />
       </div>
     );
   }
@@ -117,14 +102,27 @@ export default function SignUpPage() {
               >
                 Senha
               </label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 p-2 w-full border rounded-md bg-input text-foreground"
-              />
+              <div className="relative mt-2">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"} // Altera o tipo para texto ou senha
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-2 border rounded-md bg-input text-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)} // Alterna o estado do botão
+                  className="absolute inset-y-0 right-2 flex items-center text-secondary-foreground"
+                >
+                  {showPassword ? (
+                    <VscEye size={20} />
+                  ) : (
+                    <VscEyeClosed size={20} />
+                  )}
+                </button>
+              </div>
             </div>
 
             {error && (

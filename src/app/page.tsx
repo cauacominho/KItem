@@ -8,6 +8,21 @@ import { useRouter } from "next/navigation";
 // Usando o tipo User do Supabase diretamente
 import { User as SupabaseUser } from "@supabase/auth-js";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { FaGear } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa";
+import { MdFavorite } from "react-icons/md";
+
+import { LoaderCircle } from "lucide-react";
+import { BiSolidCollection } from "react-icons/bi";
+import CollectorCardBuilder from "@/components/CollectorCardBuilder";
 
 export default function Home() {
   const [user, setUser] = useState<SupabaseUser | null>(null); // Tipando o estado do usuário como 'SupabaseUser' ou 'null'
@@ -52,26 +67,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <svg
-          className="animate-spin h-12 w-12 text-primary"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-          />
-          <path
-            fill="currentColor"
-            d="M4 12a8 8 0 0 1 8-8V0c-5.523 0-10 4.477-10 10h2z"
-          />
-        </svg>
+        <LoaderCircle size={40} className="animate-spin" />
       </div>
     );
   }
@@ -81,15 +77,93 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <ModeToggle />
-      <h1>Bem-vindo, {user?.email ?? "Usuário"}</h1>
-      {/* Aqui pode ir mais conteúdo que deve ser visível apenas para usuários logados */}
-      <div className="mt-10">
-        <Button className="bg-destructive text-light" onClick={handleLogout}>
-          Sair
-        </Button>
+    <>
+      <nav className="p-4">
+        <div className="flex justify-between items-center">
+          <div className="text-light text-3xl font-bold">
+            {" "}
+            <span className="text-primary">K</span>Item
+          </div>
+
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  <AvatarImage src="https://avatars.githubusercontent.com/u/89112946?v=4" />
+                  <AvatarFallback>BR</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
+                  <Button
+                    variant={"link"}
+                    size={"sm"}
+                    className="w-full text-light"
+                  >
+                    <FaUserCircle /> Perfil
+                  </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Button
+                    variant={"link"}
+                    size={"sm"}
+                    className="w-full text-light"
+                  >
+                    <FaGear /> Configurações
+                  </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Button
+                    variant={"destructive"}
+                    size={"sm"}
+                    className="w-full text-light"
+                    onClick={handleLogout}
+                  >
+                    Sair
+                  </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ModeToggle />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </nav>
+
+      <div className="p-4">
+        <section className="mb-10">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center text-2xl font-bold">
+              <MdFavorite className="mr-1 text-red-700" /> Favoritos
+            </div>
+          </div>
+
+          <div className="flex md:grid md:grid-cols-3 md:gap-4 overflow-x-auto space-x-4 md:space-x-0 md:space-y-0 flex-row">
+            <CollectorCardBuilder />
+          </div>
+        </section>
+        <section className="mb-5">
+          <div className="flex justify-between items-center md:inline-block mb-4">
+            <div className="flex items-center text-2xl font-bold">
+              <BiSolidCollection className="mr-1 text-primary" /> Minhas
+              coleções
+            </div>
+            <div>
+              <a
+                className="flex items-center font-medium hover:underline"
+                href=""
+              >
+                Ver mais
+              </a>
+            </div>
+          </div>
+
+          <div className="flex md:grid md:grid-cols-3 md:gap-4 overflow-x-auto space-x-4 md:space-x-0 md:space-y-0 flex-row">
+            <CollectorCardBuilder />
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 }
